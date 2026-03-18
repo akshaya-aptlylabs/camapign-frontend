@@ -155,7 +155,6 @@ export default function UsersPanel({
                     }}
                   />
                   <Typography variant="caption" color="text.secondary">
-                    {/* user.campaignCount is number | undefined — ?? handles undefined */}
                     {user.campaignCount ?? 0} campaign
                     {(user.campaignCount ?? 0) !== 1 ? "s" : ""}
                   </Typography>
