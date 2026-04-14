@@ -1,5 +1,3 @@
-// src/pages/EditCampaignPage.tsx
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -28,8 +26,6 @@ import {
   FormErrors,
 } from "../types";
 
-// EditFormData extends CampaignFormData — adds status field for editing
-// CampaignFormData doesn't have status because you can't set it at creation time
 interface EditFormData extends CampaignFormData {
   status: CampaignStatus;
 }
@@ -39,7 +35,6 @@ export default function EditCampaignPage() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState<EditFormData | null>(null);
-  // null until fetched — TS forces us to handle null before using form
   const [tagInput, setTagInput] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
@@ -71,12 +66,10 @@ export default function EditCampaignPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // handleChange: keyof EditFormData — covers all fields including status
   const handleChange =
     (field: keyof EditFormData) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setForm((f) => (f ? { ...f, [field]: e.target.value } : f));
-      // f ? ... : f — we only update if form has loaded (not null)
       setFieldErrors((fe) => ({ ...fe, [field]: undefined }));
     };
 
@@ -141,8 +134,6 @@ export default function EditCampaignPage() {
       </Box>
     );
 
-  // After loading, form is either EditFormData or null (if fetch failed)
-  // TypeScript requires us to handle the null case
   if (!form)
     return (
       <Box sx={{ p: 3, flex: 1, bgcolor: "background.default" }}>
@@ -303,7 +294,6 @@ export default function EditCampaignPage() {
               inputProps={{ min: 0 }}
             />
 
-            {/* Tags */}
             <Box>
               <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>
                 Tags

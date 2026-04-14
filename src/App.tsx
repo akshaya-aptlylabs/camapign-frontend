@@ -1,59 +1,51 @@
-import React, { useState, ReactNode } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { CssBaseline, Box } from "@mui/material";
-import Sidebar from "./components/SideBar";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { CssBaseline } from "@mui/material";
+import { UserFilterProvider } from "./context/UserfilterContext";
+import { AppLayout } from "./components";
+import {
+  ROOT_PATH,
+  CAMPAIGN_PATH,
+  MESSAGE_PATH,
+  CAMPAIGN_ROUTES,
+  EVENT_PATH,
+  EVENT_ROUTES,
+  MESSAGE_ROUTES,
+} from "./router";
 
-import DashboardPage from "./pages/DashboardPage";
-import CreateCampaignPage from "./pages/CreateCampaignPage";
-import CampaignDetailPage from "./pages/CampaignDetailPage";
-import EditCampaignPage from "./pages/EditCampaignPage";
-
-interface LayoutProps {
-  children: ReactNode;
-}
-
-function Layout({ children }: LayoutProps) {
-  const [activeUserId, setActiveUserId] = useState<string | null>(null);
-
-  const childrenWithProps = React.Children.map(children, (child) =>
-    React.isValidElement(child)
-      ? React.cloneElement(child, { activeUserId } as Record<string, unknown>)
-      : child,
-  );
-
-  return (
-    <Box sx={{ display: "flex", minHeight: "100vh" }}>
-      <Sidebar onUserFilter={setActiveUserId} activeUserId={activeUserId} />
-
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          overflow: "auto",
-        }}
-      >
-        {childrenWithProps}
-      </Box>
-    </Box>
-  );
-}
+import {
+  DashboardPage,
+  CreateCampaignPage,
+  CampaignDetailPage,
+  EditCampaignPage,
+  // 👇 uncomment when ready
+  // EventsPage,
+  // EventDetailPage,
+  // MessagesPage,
+} from "./pages";
 
 export default function App() {
   return (
     <>
       <CssBaseline />
-      <BrowserRouter>
-        <Layout>
+
+      <UserFilterProvider>
+        {" "}
+        {/* ✅ REQUIRED */}
+        <BrowserRouter>
           <Routes>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/campaigns" element={<DashboardPage />} />
-            <Route path="/campaigns/new" element={<CreateCampaignPage />} />
-            <Route path="/campaigns/:id" element={<CampaignDetailPage />} />
-            <Route path="/campaigns/:id/edit" element={<EditCampaignPage />} />
+            <Route path={ROOT_PATH} element={<Navigate to={CAMPAIGN_PATH} />} />
+
+            <Route element={<AppLayout />}>
+              <Route path={CAMPAIGN_PATH}>
+                <Route index element={<DashboardPage />} />
+                <Route path="new" element={<CreateCampaignPage />} />
+                <Route path=":id" element={<CampaignDetailPage />} />
+                <Route path=":id/edit" element={<EditCampaignPage />} />
+              </Route>
+            </Route>
           </Routes>
-        </Layout>
-      </BrowserRouter>
+        </BrowserRouter>
+      </UserFilterProvider>
     </>
   );
 }

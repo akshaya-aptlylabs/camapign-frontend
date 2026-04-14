@@ -1,12 +1,3 @@
-// src/pages/DashboardPage.tsx
-// ─────────────────────────────────────────────────────────────
-// TYPESCRIPT LESSON: useState with complex types
-//
-//  useState<Campaign[]>([])    — typed array, starts empty
-//  useState<string | null>(null) — string or null
-//  useState<CampaignStats | null>(null) — object or null
-// ─────────────────────────────────────────────────────────────
-
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -32,19 +23,19 @@ import {
   SearchOutlined,
   NotificationsOutlined,
 } from "@mui/icons-material";
+import { ConnectionStatus, StatsBar } from "../components";
+import { CampaignCard } from "../pages";
+
 import { campaignApi, userApi } from "../services/api";
-import CampaignCard from "./CampaignCard";
-import StatsBar from "../components/StatsBar";
 import {
   Campaign,
   CampaignStats,
   CampaignStatus,
   User,
-  DashboardPageProps,
   TabConfig,
-  SnackbarState,
 } from "../types";
 import { useSnackbar } from "../hooks";
+import { useUserFilter } from "../context";
 
 const TABS: TabConfig[] = [
   { label: "Active", value: "active" },
@@ -52,9 +43,8 @@ const TABS: TabConfig[] = [
   { label: "Draft", value: "draft" },
 ];
 
-type TabCounts = Record<CampaignStatus, number>;
-
-export default function DashboardPage({ activeUserId }: DashboardPageProps) {
+export default function DashboardPage() {
+  const { activeUserId } = useUserFilter();
   const navigate = useNavigate();
 
   const [tabValue, setTabValue] = useState<number>(0);
@@ -175,7 +165,6 @@ export default function DashboardPage({ activeUserId }: DashboardPageProps) {
         minHeight: "100vh",
       }}
     >
-      {/* Top bar */}
       <Box
         sx={{
           px: 3,
@@ -192,7 +181,6 @@ export default function DashboardPage({ activeUserId }: DashboardPageProps) {
           placeholder="Filter by name or description..."
           size="small"
           value={search}
-          // ChangeEvent<HTMLInputElement> — e.target.value is string
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setSearch(e.target.value)
           }
@@ -207,13 +195,13 @@ export default function DashboardPage({ activeUserId }: DashboardPageProps) {
             ),
           }}
         />
+        <ConnectionStatus />
         <NotificationsOutlined
           sx={{ color: "text.secondary", cursor: "pointer" }}
         />
       </Box>
 
       <Box sx={{ p: 3, flex: 1 }}>
-        {/* Promo banner */}
         <Paper
           sx={{
             mb: 3,
@@ -254,7 +242,6 @@ export default function DashboardPage({ activeUserId }: DashboardPageProps) {
 
         <StatsBar stats={stats} loading={statsLoading} />
 
-        {/* Header */}
         <Box
           sx={{
             display: "flex",
@@ -287,7 +274,6 @@ export default function DashboardPage({ activeUserId }: DashboardPageProps) {
           </Button>
         </Box>
 
-        {/* Filters */}
         <Box sx={{ display: "flex", gap: 2, mb: 2.5, flexWrap: "wrap" }}>
           <FormControl size="small" sx={{ minWidth: 150 }}>
             <InputLabel>Triggered by</InputLabel>
@@ -317,7 +303,6 @@ export default function DashboardPage({ activeUserId }: DashboardPageProps) {
           </FormControl>
         </Box>
 
-        {/* Tabs */}
         <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
           <Tabs value={tabValue} onChange={(_e, v: number) => setTabValue(v)}>
             {TABS.map((tab: TabConfig, idx: number) => (

@@ -7,12 +7,14 @@ import {
   IconButton,
   Paper,
   Chip,
+  Grid,
   CircularProgress,
   Alert,
   Divider,
   LinearProgress,
+  Tab,
+  Tabs,
 } from "@mui/material";
-import Grid from "@mui/material/GridLegacy";
 import {
   ArrowBack,
   EditOutlined,
@@ -22,9 +24,12 @@ import {
   TouchAppOutlined,
   ShoppingCartOutlined,
   PeopleOutlined,
+  TimelineOutlined,
+  MessageOutlined,
 } from "@mui/icons-material";
 import { campaignApi } from "../services/api";
 import UserBadge from "../components/UserBadge";
+import { EventsPage, MessagesPage } from "../pages";
 import { Campaign, CampaignStatus, StatusConfig } from "../types";
 
 const statusConfig: Record<CampaignStatus, StatusConfig> = {
@@ -34,7 +39,6 @@ const statusConfig: Record<CampaignStatus, StatusConfig> = {
   paused: { label: "Paused", color: "#F39C12", bgcolor: "#FEF3C7" },
 };
 
-// Typed props for the sub-component
 interface MetricCardProps {
   icon: ReactElement;
   label: string;
@@ -104,21 +108,23 @@ function MetricCard({
 export default function CampaignDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [tab, setTab] = useState<number>(0);
 
   useEffect(() => {
     if (!id) return;
     campaignApi
       .getById(id)
       .then((res) => setCampaign(res.data))
-      .catch((err: Error) => setError(err.message))
+      .catch((err) =>
+        setError(err instanceof Error ? err.message : "Failed to load"),
+      )
       .finally(() => setLoading(false));
   }, [id]);
 
-  const handleDelete = async (): Promise<void> => {
+  const handleDelete = async () => {
     if (!id || !window.confirm("Delete this campaign?")) return;
     try {
       await campaignApi.delete(id);
@@ -156,7 +162,7 @@ export default function CampaignDetailPage() {
   return (
     <Box sx={{ flex: 1, bgcolor: "background.default", p: 3 }}>
       <Box sx={{ maxWidth: 900, mx: "auto" }}>
-        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2, mb: 4 }}>
+        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2, mb: 3 }}>
           <IconButton
             onClick={() => navigate("/")}
             sx={{ bgcolor: "background.paper", mt: 0.5 }}
@@ -212,7 +218,7 @@ export default function CampaignDetailPage() {
         {campaign.user && (
           <Paper
             sx={{
-              p: 2.5,
+              p: 2,
               mb: 3,
               borderRadius: 3,
               display: "flex",
@@ -237,132 +243,178 @@ export default function CampaignDetailPage() {
           </Paper>
         )}
 
-        <Paper sx={{ p: 3, mb: 3, borderRadius: 3 }}>
-          <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2 }}>
-            Campaign Details
-          </Typography>
-          <Grid container spacing={2}>
-            {(
-              [
-                ["Triggered By", campaign.triggeredBy],
-                ["Sender", campaign.senderName ?? "—"],
-                ["Sender Email", campaign.senderEmail ?? "—"],
-                ["Subject", campaign.subject ?? "—"],
-                [
-                  "Total Recipients",
-                  campaign.totalRecipients?.toLocaleString() ?? "0",
-                ],
-                [
-                  "Started",
-                  campaign.startedAt
-                    ? new Date(campaign.startedAt).toLocaleDateString()
-                    : "—",
-                ],
-                [
-                  "Completed",
-                  campaign.completedAt
-                    ? new Date(campaign.completedAt).toLocaleDateString()
-                    : "—",
-                ],
-                ["Created", new Date(campaign.createdAt).toLocaleDateString()],
-              ] as [string, string][]
-            ).map(([label, value]) => (
-              <Grid xs={12} sm={6} md={3} key={label}>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  fontWeight={500}
-                >
-                  {label}
-                </Typography>
-                <Typography variant="body2" fontWeight={600} sx={{ mt: 0.25 }}>
-                  {value}
-                </Typography>
-              </Grid>
-            ))}
-          </Grid>
-          {campaign.tags?.length > 0 && (
-            <>
-              <Divider sx={{ my: 2 }} />
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 1,
-                  flexWrap: "wrap",
-                  alignItems: "center",
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  fontWeight={500}
-                  sx={{ mr: 1 }}
-                >
-                  Tags:
-                </Typography>
-                {campaign.tags.map((tag: string) => (
-                  <Chip key={tag} label={tag} size="small" variant="outlined" />
-                ))}
-              </Box>
-            </>
-          )}
-        </Paper>
+        {/* Tabs */}
+        <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+          <Tabs value={tab} onChange={(_, v: number) => setTab(v)}>
+            <Tab label="Overview" />
+            <Tab
+              label={
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                  <TimelineOutlined sx={{ fontSize: 16 }} />
+                  Events
+                </Box>
+              }
+            />
+            <Tab
+              label={
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                  <MessageOutlined sx={{ fontSize: 16 }} />
+                  Messages
+                </Box>
+              }
+            />
+          </Tabs>
+        </Box>
 
-        <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2 }}>
-          Performance Metrics
-        </Typography>
-        <Box sx={{ display: "flex", gap: 2, mb: 2, flexWrap: "wrap" }}>
-          <MetricCard
-            icon={<EmailOutlined />}
-            label="Delivered"
-            value={campaign.delivered}
-            rate={metrics?.deliveredRate}
-            rateLabel="of total recipients"
-            color="#6C63FF"
-          />
-          <MetricCard
-            icon={<OpenInNewOutlined />}
-            label="Opened"
-            value={campaign.opened}
-            rate={metrics?.openRate}
-            rateLabel="of delivered"
-            color="#2ECC71"
-          />
-        </Box>
-        <Box sx={{ display: "flex", gap: 2, mb: 2, flexWrap: "wrap" }}>
-          <MetricCard
-            icon={<TouchAppOutlined />}
-            label="Clicked"
-            value={campaign.clicked}
-            rate={metrics?.clickRate}
-            rateLabel="of opened"
-            color="#F39C12"
-          />
-          <MetricCard
-            icon={<ShoppingCartOutlined />}
-            label="Converted"
-            value={campaign.converted}
-            rate={metrics?.conversionRate}
-            rateLabel="of delivered"
-            color="#FF6584"
-          />
-        </Box>
-        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-          <MetricCard
-            icon={<PeopleOutlined />}
-            label="Bounced"
-            value={campaign.bounced}
-            rate={metrics?.bounceRate}
-            rateLabel="bounce rate"
-            color="#E74C3C"
-          />
-          <MetricCard
-            icon={<PeopleOutlined />}
-            label="Unsubscribed"
-            value={campaign.unsubscribed}
-            color="#6B7280"
-          />
-        </Box>
+        {/* Tab 0: Overview */}
+        {tab === 0 && (
+          <Box>
+            {/* Campaign details */}
+            <Paper sx={{ p: 3, mb: 3, borderRadius: 3 }}>
+              <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2 }}>
+                Campaign Details
+              </Typography>
+              <Grid container spacing={2}>
+                {(
+                  [
+                    ["Triggered By", campaign.triggeredBy],
+                    ["Sender", campaign.senderName ?? "—"],
+                    ["Sender Email", campaign.senderEmail ?? "—"],
+                    ["Subject", campaign.subject ?? "—"],
+                    [
+                      "Total Recipients",
+                      campaign.totalRecipients?.toLocaleString() ?? "0",
+                    ],
+                    [
+                      "Started",
+                      campaign.startedAt
+                        ? new Date(campaign.startedAt).toLocaleDateString()
+                        : "—",
+                    ],
+                    [
+                      "Completed",
+                      campaign.completedAt
+                        ? new Date(campaign.completedAt).toLocaleDateString()
+                        : "—",
+                    ],
+                    [
+                      "Created",
+                      new Date(campaign.createdAt).toLocaleDateString(),
+                    ],
+                  ] as [string, string][]
+                ).map(([label, value]) => (
+                  <Grid size={{ xs: 12, sm: 6, md: 3 }} key={label}>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={500}
+                    >
+                      {label}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      fontWeight={600}
+                      sx={{ mt: 0.25 }}
+                    >
+                      {value}
+                    </Typography>
+                  </Grid>
+                ))}
+              </Grid>
+              {campaign.tags?.length > 0 && (
+                <>
+                  <Divider sx={{ my: 2 }} />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 1,
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={500}
+                      sx={{ mr: 1 }}
+                    >
+                      Tags:
+                    </Typography>
+                    {campaign.tags.map((tag: string) => (
+                      <Chip
+                        key={tag}
+                        label={tag}
+                        size="small"
+                        variant="outlined"
+                      />
+                    ))}
+                  </Box>
+                </>
+              )}
+            </Paper>
+
+            {/* Metrics */}
+            <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2 }}>
+              Performance Metrics
+            </Typography>
+            <Box sx={{ display: "flex", gap: 2, mb: 2, flexWrap: "wrap" }}>
+              <MetricCard
+                icon={<EmailOutlined />}
+                label="Delivered"
+                value={campaign.delivered}
+                rate={metrics?.deliveredRate}
+                rateLabel="of total"
+                color="#6C63FF"
+              />
+              <MetricCard
+                icon={<OpenInNewOutlined />}
+                label="Opened"
+                value={campaign.opened}
+                rate={metrics?.openRate}
+                rateLabel="of delivered"
+                color="#2ECC71"
+              />
+            </Box>
+            <Box sx={{ display: "flex", gap: 2, mb: 2, flexWrap: "wrap" }}>
+              <MetricCard
+                icon={<TouchAppOutlined />}
+                label="Clicked"
+                value={campaign.clicked}
+                rate={metrics?.clickRate}
+                rateLabel="of opened"
+                color="#F39C12"
+              />
+              <MetricCard
+                icon={<ShoppingCartOutlined />}
+                label="Converted"
+                value={campaign.converted}
+                rate={metrics?.conversionRate}
+                rateLabel="of delivered"
+                color="#FF6584"
+              />
+            </Box>
+            <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+              <MetricCard
+                icon={<PeopleOutlined />}
+                label="Bounced"
+                value={campaign.bounced}
+                rate={metrics?.bounceRate}
+                rateLabel="bounce rate"
+                color="#E74C3C"
+              />
+              <MetricCard
+                icon={<PeopleOutlined />}
+                label="Unsubscribed"
+                value={campaign.unsubscribed}
+                color="#6B7280"
+              />
+            </Box>
+          </Box>
+        )}
+
+        {tab === 1 && id && <EventsPage campaignId={id} />}
+
+        {tab === 2 && id && <MessagesPage campaignId={id} />}
       </Box>
     </Box>
   );

@@ -44,7 +44,6 @@ const statusConfig: Record<CampaignStatus, StatusConfig> = {
   paused: { label: "Paused", color: "#F39C12", bgcolor: "#FEF3C7" },
 };
 
-// ── Small sub-component — typed inline ───────────────────────────────────────
 interface MetricCellProps {
   value: string | number;
   label: string;

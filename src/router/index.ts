@@ -1,0 +1,9 @@
+export {
+  ROOT_PATH,
+  CAMPAIGN_ROUTES,
+  EVENT_ROUTES,
+  MESSAGE_ROUTES,
+  CAMPAIGN_PATH,
+  MESSAGE_PATH,
+  EVENT_PATH,
+} from "./paths";
