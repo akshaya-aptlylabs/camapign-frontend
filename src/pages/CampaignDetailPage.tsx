@@ -243,7 +243,6 @@ export default function CampaignDetailPage() {
           </Paper>
         )}
 
-        {/* Tabs */}
         <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
           <Tabs value={tab} onChange={(_, v: number) => setTab(v)}>
             <Tab label="Overview" />
@@ -266,10 +265,8 @@ export default function CampaignDetailPage() {
           </Tabs>
         </Box>
 
-        {/* Tab 0: Overview */}
         {tab === 0 && (
           <Box>
-            {/* Campaign details */}
             <Paper sx={{ p: 3, mb: 3, borderRadius: 3 }}>
               <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2 }}>
                 Campaign Details
@@ -353,7 +350,6 @@ export default function CampaignDetailPage() {
               )}
             </Paper>
 
-            {/* Metrics */}
             <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2 }}>
               Performance Metrics
             </Typography>

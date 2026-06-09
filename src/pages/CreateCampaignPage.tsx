@@ -202,7 +202,6 @@ export default function CreateCampaignPage() {
                 rows={3}
               />
 
-              {/* Owner selector */}
               <FormControl fullWidth error={!!fieldErrors.userId}>
                 <InputLabel>Campaign Owner *</InputLabel>
                 <Select
@@ -452,7 +451,6 @@ export default function CreateCampaignPage() {
             </Box>
           )}
 
-          {/* Actions */}
           <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
             <Button
               variant="outlined"

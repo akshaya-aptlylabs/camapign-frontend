@@ -4,19 +4,19 @@ export const EVENT_PATH = "/events";
 export const MESSAGE_PATH = "/messages";
 
 export const CAMPAIGN_ROUTES = {
-  root: "",
-  new: "new",
-  detail: ":id",
-  edit: ":id/edit",
-};
-
-export const EVENT_ROUTES = {
-  root: "",
-  detail: ":id",
+  root: () => "/campaigns",
+  new: () => "/campaigns/new",
+  detail: (id: string) => `/campaigns/${id}`,
+  edit: (id: string) => `/campaigns/${id}/edit`,
 };
 
 export const MESSAGE_ROUTES = {
-  root: "",
-  detail: ":id",
-  edit: ":id/edit",
+  root: () => "/messages",
+  detail: (id: string) => `/messages/${id}`,
+  edit: (id: string) => `/messages/${id}/edit`,
+};
+
+export const EVENT_ROUTES = {
+  root: () => "/events",
+  detail: (id: string) => `/events/${id}`,
 };

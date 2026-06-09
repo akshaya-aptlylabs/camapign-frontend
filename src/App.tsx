@@ -17,10 +17,9 @@ import {
   CreateCampaignPage,
   CampaignDetailPage,
   EditCampaignPage,
-  // 👇 uncomment when ready
-  // EventsPage,
-  // EventDetailPage,
-  // MessagesPage,
+  EventsPage,
+  EventDetailPage,
+  MessagesPage,
 } from "./pages";
 
 export default function App() {
@@ -30,7 +29,6 @@ export default function App() {
 
       <UserFilterProvider>
         {" "}
-        {/* ✅ REQUIRED */}
         <BrowserRouter>
           <Routes>
             <Route path={ROOT_PATH} element={<Navigate to={CAMPAIGN_PATH} />} />

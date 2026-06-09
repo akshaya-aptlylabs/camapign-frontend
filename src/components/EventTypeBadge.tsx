@@ -8,11 +8,11 @@ import {
   Chip,
   CircularProgress,
   Alert,
-  Grid,
   IconButton,
 } from "@mui/material";
 import { ArrowBack, AccessTimeOutlined } from "@mui/icons-material";
 
+import EventTypeBadge from "../components/EventTypeBadge";
 import { eventApi } from "../services/api";
 import { EVENT_ROUTES } from "../router";
 import { EventType, CampaignEvent } from "../types";
@@ -54,22 +54,11 @@ function fmtDate(iso: string): string {
   });
 }
 
-type Props = {
-  type: EventType;
-  size?: "small" | "medium";
-};
-
-export default function EventTypeBadge({ type, size = "medium" }: Props) {
-  return (
-    <span>
-      {type} ({size})
-    </span>
-  );
-
+export default function EventTypePage() {
   const navigate = useNavigate();
 
   const [events, setEvents] = useState<CampaignEvent[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<EventType | "all">("all");
 
@@ -91,12 +80,8 @@ export default function EventTypeBadge({ type, size = "medium" }: Props) {
   return (
     <Box sx={{ flex: 1, bgcolor: "background.default", p: 3 }}>
       <Box sx={{ maxWidth: 900, mx: "auto" }}>
-        {/* Header */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
-          <IconButton
-            onClick={() => navigate(-1)}
-            sx={{ bgcolor: "background.paper" }}
-          >
+          <IconButton onClick={() => navigate(-1)}>
             <ArrowBack />
           </IconButton>
           <Box>
@@ -104,33 +89,15 @@ export default function EventTypeBadge({ type, size = "medium" }: Props) {
               Event Type Badges
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              All variants of the EventTypeBadge component, with live events
-              from the API
+              All variants with live data
             </Typography>
           </Box>
         </Box>
 
         <Paper sx={{ p: 3, mb: 3, borderRadius: 3 }}>
-          <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
-            All Variants
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
-            Every <code>EventType</code> value, both sizes
-          </Typography>
-
           {CATEGORY_GROUPS.map((group) => (
             <Box key={group.label} sx={{ mb: 3 }}>
-              <Typography
-                variant="caption"
-                fontWeight={700}
-                color="text.secondary"
-                sx={{
-                  textTransform: "uppercase",
-                  letterSpacing: "0.08em",
-                  mb: 1.5,
-                  display: "block",
-                }}
-              >
+              <Typography variant="caption" fontWeight={700}>
                 {group.label}
               </Typography>
 
@@ -138,91 +105,31 @@ export default function EventTypeBadge({ type, size = "medium" }: Props) {
                 sx={{
                   display: "grid",
                   gridTemplateColumns: "1fr auto auto",
-                  alignItems: "center",
                   gap: 1.5,
+                  mt: 1,
                 }}
               >
                 {group.types.map((type) => (
-                  <>
-                    <Typography
-                      key={`${type}-name`}
-                      variant="body2"
-                      color="text.secondary"
-                      fontFamily="monospace"
-                      fontSize="0.78rem"
-                    >
-                      {type}
-                    </Typography>
+                  <Box key={type} sx={{ display: "contents" }}>
+                    <Typography fontSize="0.8rem">{type}</Typography>
 
-                    <Box
-                      key={`${type}-small`}
-                      sx={{ display: "flex", justifyContent: "flex-end" }}
-                    >
-                      <EventTypeBadge type={type} size="small" />
-                    </Box>
-
-                    <Box
-                      key={`${type}-medium`}
-                      sx={{ display: "flex", justifyContent: "flex-end" }}
-                    >
-                      <EventTypeBadge type={type} size="medium" />
-                    </Box>
-                  </>
+                    {/* <EventTypeBadge type={type} size="small" />
+                    <EventTypeBadge type={type} size="medium" /> */}
+                  </Box>
                 ))}
               </Box>
-
-              {group === CATEGORY_GROUPS[0] && (
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr auto auto",
-                    gap: 1.5,
-                    mt: 0.5,
-                  }}
-                >
-                  <span />
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ textAlign: "right" }}
-                  >
-                    small
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ textAlign: "right" }}
-                  >
-                    medium
-                  </Typography>
-                </Box>
-              )}
 
               <Divider sx={{ mt: 2 }} />
             </Box>
           ))}
         </Paper>
 
-        <Paper sx={{ p: 3, mb: 3, borderRadius: 3 }}>
-          <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
-            Filter Live Events
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Click a badge to filter the events list below
-          </Typography>
-
+        <Paper sx={{ p: 3, mb: 3 }}>
           <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
             <Chip
               label="All"
-              size="small"
               onClick={() => setActiveFilter("all")}
-              sx={{
-                fontWeight: 700,
-                fontSize: "0.72rem",
-                bgcolor: activeFilter === "all" ? "primary.main" : "grey.100",
-                color: activeFilter === "all" ? "white" : "text.secondary",
-                cursor: "pointer",
-              }}
+              color={activeFilter === "all" ? "primary" : "default"}
             />
 
             {ALL_EVENT_TYPES.map((type) => (
@@ -231,132 +138,52 @@ export default function EventTypeBadge({ type, size = "medium" }: Props) {
                 onClick={() =>
                   setActiveFilter((prev) => (prev === type ? "all" : type))
                 }
-                sx={{
-                  borderRadius: 10,
-                  cursor: "pointer",
-                  outline:
-                    activeFilter === type
-                      ? "2px solid"
-                      : "2px solid transparent",
-                  outlineColor:
-                    activeFilter === type ? "primary.main" : "transparent",
-                  outlineOffset: 2,
-                  transition: "outline-color 0.15s ease",
-                }}
+                sx={{ cursor: "pointer" }}
               >
-                <EventTypeBadge type={type} size="small" />
+                {/* <EventTypeBadge type={type} size="small" /> */}
               </Box>
             ))}
           </Box>
         </Paper>
 
-        <Paper sx={{ p: 3, borderRadius: 3 }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 2,
-            }}
-          >
-            <Typography variant="subtitle1" fontWeight={700}>
-              Live Events
-              {activeFilter !== "all" && (
-                <Typography
-                  component="span"
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ ml: 1 }}
-                >
-                  — filtered by <strong>{activeFilter}</strong>
-                </Typography>
-              )}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {filteredEvents.length} event
-              {filteredEvents.length !== 1 ? "s" : ""}
-            </Typography>
-          </Box>
-
+        <Paper sx={{ p: 3 }}>
           {loading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-              <CircularProgress size={28} />
-            </Box>
+            <CircularProgress />
           ) : error ? (
-            <Alert severity="error" sx={{ borderRadius: 2 }}>
-              {error}
-            </Alert>
+            <Alert severity="error">{error}</Alert>
           ) : filteredEvents.length === 0 ? (
-            <Box sx={{ textAlign: "center", py: 4 }}>
-              <Typography color="text.secondary">
-                {activeFilter === "all"
-                  ? "No events found — run npm run seed to generate data"
-                  : `No events of type "${activeFilter}"`}
-              </Typography>
-            </Box>
+            <Typography>No events found</Typography>
           ) : (
-            <Box>
-              {filteredEvents.map((event) => (
-                <Box
-                  key={event.id}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 2,
-                    py: 1.5,
-                    borderBottom: "1px solid",
-                    borderColor: "divider",
-                    "&:last-child": { borderBottom: "none" },
-                    cursor: "pointer",
-                    borderRadius: 1,
-                    "&:hover": { bgcolor: "action.hover" },
-                    px: 1,
-                  }}
-                  onClick={() => navigate(EVENT_ROUTES.root(event.id))}
-                >
-                  <EventTypeBadge type={event.type} size="small" />
+            filteredEvents.map((event) => (
+              <Box
+                key={event.id}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                  py: 1,
+                  borderBottom: "1px solid #eee",
+                  cursor: "pointer",
+                }}
+                onClick={() => navigate(EVENT_ROUTES.detail(event.id))}
+              >
+                {/* <EventTypeBadge type={event.type} size="small" /> */}
 
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography variant="body2" fontWeight={600} noWrap>
-                      {event.name}
-                    </Typography>
-                    {event.campaign && (
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        noWrap
-                      >
-                        {event.campaign.name}
-                      </Typography>
-                    )}
-                  </Box>
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 0.5,
-                      flexShrink: 0,
-                    }}
-                  >
-                    <AccessTimeOutlined
-                      sx={{ fontSize: 13, color: "text.secondary" }}
-                    />
-                    <Typography variant="caption" color="text.secondary">
-                      {fmtDate(event.occurredAt)}
-                    </Typography>
-                  </Box>
-
-                  {(event.messageCount ?? 0) > 0 && (
-                    <Chip
-                      label={`${event.messageCount} msg`}
-                      size="small"
-                      sx={{ fontSize: "0.68rem", height: 20 }}
-                    />
-                  )}
+                <Box sx={{ flex: 1 }}>
+                  <Typography>{event.name}</Typography>
+                  <Typography fontSize="0.75rem" color="gray">
+                    {event.campaign?.name}
+                  </Typography>
                 </Box>
-              ))}
-            </Box>
+
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                  <AccessTimeOutlined fontSize="small" />
+                  <Typography fontSize="0.75rem">
+                    {fmtDate(event.occurredAt)}
+                  </Typography>
+                </Box>
+              </Box>
+            ))
           )}
         </Paper>
       </Box>

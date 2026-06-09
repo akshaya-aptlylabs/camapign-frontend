@@ -141,9 +141,6 @@ export default function EditCampaignPage() {
       </Box>
     );
 
-  // After this point, TypeScript knows form is EditFormData (not null)
-  // because we returned early above if it was null
-
   return (
     <Box sx={{ flex: 1, bgcolor: "background.default", p: 3 }}>
       <Box sx={{ maxWidth: 720, mx: "auto" }}>

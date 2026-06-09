@@ -1,5 +1,3 @@
-// src/components/UsersPanel.tsx
-
 import { useState, useEffect } from "react";
 import {
   Box,
@@ -12,15 +10,12 @@ import {
 import { userApi } from "../services/api";
 import { User, UserRole, RoleConfig, UsersPanelProps } from "../types";
 
-// Record<UserRole, RoleConfig> — exhaustive: all 3 roles must be defined
 const roleConfig: Record<UserRole, RoleConfig> = {
   admin: { color: "#6C63FF", bg: "#EFEDFF", label: "Admin" },
   manager: { color: "#2ECC71", bg: "#E8FBF0", label: "Manager" },
   viewer: { color: "#F39C12", bg: "#FEF3C7", label: "Viewer" },
 };
 
-// Helper: get initials from full name
-// Return type annotation: string
 function getInitials(name: string): string {
   return name
     .split(" ")
@@ -42,7 +37,6 @@ export default function UsersPanel({
     userApi
       .getAll()
       .then((res) => setUsers(res.data || []))
-      // res.data is typed as User[] — from ApiResponse<User[]>
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
@@ -67,7 +61,6 @@ export default function UsersPanel({
 
   return (
     <Box>
-      {/* Header row */}
       <Box
         sx={{
           px: 2,
@@ -92,16 +85,13 @@ export default function UsersPanel({
             fontWeight={600}
             sx={{ cursor: "pointer" }}
             onClick={() => onUserFilter(null)}
-            // onClick: () => void — no params needed, TypeScript infers this
           >
             Clear filter
           </Typography>
         )}
       </Box>
 
-      {/* User rows */}
       {users.map((user: User, i: number) => {
-        // user is typed as User — all fields available with autocomplete
         const role = roleConfig[user.role];
         const isActive = activeUserId === user.id;
 
@@ -109,7 +99,6 @@ export default function UsersPanel({
           <Box key={user.id}>
             <Box
               onClick={() => onUserFilter(isActive ? null : user.id)}
-              // event handler typed as: () => void
               sx={{
                 px: 2,
                 py: 1.25,

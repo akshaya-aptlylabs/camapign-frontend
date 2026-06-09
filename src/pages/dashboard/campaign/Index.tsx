@@ -231,7 +231,6 @@ export default function Campaigns({ activeUserId }: DashboardPageProps) {
         </Button>
       </Box>
 
-      {/* Filters */}
       <Box sx={{ display: "flex", gap: 2, mb: 2.5, flexWrap: "wrap" }}>
         <FormControl size="small" sx={{ minWidth: 150 }}>
           <InputLabel>Triggered by</InputLabel>
@@ -261,7 +260,6 @@ export default function Campaigns({ activeUserId }: DashboardPageProps) {
         </FormControl>
       </Box>
 
-      {/* Tabs */}
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
         <Tabs value={tabValue} onChange={(_e, v: number) => setTabValue(v)}>
           {TABS.map((tab: TabConfig, idx: number) => (

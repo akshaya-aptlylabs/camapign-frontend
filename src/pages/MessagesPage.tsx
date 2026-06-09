@@ -47,7 +47,6 @@ function fmtDate(iso?: string): string {
 }
 
 interface Props {
-  // Used as a tab: campaignId or eventId passed as prop
   campaignId?: string;
   eventId?: string;
   status?: string;
